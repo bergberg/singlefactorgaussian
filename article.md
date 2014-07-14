@@ -34,4 +34,3 @@ unobserved variable $y$
 $P(\lambda|\rho,k,N,I)\propto \int_0^1 (1-G(y;\lambda,\rho))^{N-k}\varphi(y)\lambda^{\alpha-1}(1-\lambda)^{\beta-1} \mathrm{d}y$
 
 We implement this model in Stan  [@stan-software:2014] as follows:
-
