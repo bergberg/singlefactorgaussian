@@ -3,19 +3,20 @@ PD model calibration
 
 Single factor one-period model
 ------------------------------
+%Model description
 
-The likelihood of finding $k$ defaults out of $N$
-observations, given a long-term average default rate $\lambda$,  asset
+In this model, the likelihood of finding $k_t$ defaults out of $N_t$
+observations in period $t$, given the value of the systemic factor $y$, the long-term average default rate $\lambda$ and the asset
 correlation $\rho$, is given by:
 
-$$P(k|\rho,\lambda,y,N,I)=\frac{N!}{k!(N-k)!} G(y;\lambda,\rho)^{k}
-(1-G(y;\lambda,\rho))^{N-k} \varphi(y)$$
+$$P(k_t|\rho,\lambda,y,N_t,I)=\left(\begin{matrix} k_t \\ N_t\end{matrix}\right) G(y;\lambda,\rho)^{k_t}
+(1-G(y;\lambda,\rho))^{N_t-k_t}$$
 
 where
 
 $$G(y;\lambda,\rho)=\Phi(\frac{\Phi^{-1} (\lambda)-\sqrt{\rho} y}{\sqrt{1-\rho}}) $$
 
-and $y$ is the normally distributed single factor representing systemic risk. Using
+The systemic factor $y$ is assumed to be normally distributed. Using
 Bayes’ theorem for inverting conditional probabilities, the posterior for
 $\lambda$ is
 
