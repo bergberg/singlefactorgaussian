@@ -1,37 +1,42 @@
-PD model calibration
-====================
-
-Single factor one-period model
-------------------------------
-%Model description
-
-In this model, the likelihood of finding $k_t$ defaults out of $N_t$
-observations in period $t$, given the value of the systemic factor $y$, the long-term average default rate $\lambda$ and the asset
+# Single factor one-period model
+## Introduction
+[...]
+## Model specification
+The likelihood of finding $k_t$ defaults out of $N_t$
+observations in periods $t=1\dots T$, given the value of the systemic factors $y_t$, the long-term average default rate $\lambda$ and the asset
 correlation $\rho$, is given by:
 
-$$P(k_t|\rho,\lambda,y,N_t,I)=\left(\begin{matrix} k_t \\ N_t\end{matrix}\right) G(y;\lambda,\rho)^{k_t}
-(1-G(y;\lambda,\rho))^{N_t-k_t}$$
+(@lh) $P(\mathbf{k}|\rho,\lambda,y,N_t,I)=\prod_{t=1}^{T}\left(\begin{matrix} k_t \\ N_t\end{matrix}\right) G_t^{k_t}
+(1-G_t)^{N_t-k_t}$
 
-where
+where the *latent variables* $G_t$ are defined as
 
-$$G(y;\lambda,\rho)=\Phi(\frac{\Phi^{-1} (\lambda)-\sqrt{\rho} y}{\sqrt{1-\rho}}) $$
+$$G_t(y_t;\lambda,\rho)=\Phi(\frac{\Phi^{-1} (\lambda)-\sqrt{\rho} y_t}{\sqrt{1-\rho}}) $$
 
-The systemic factor $y$ is assumed to be normally distributed. Using
-Bayes’ theorem for inverting conditional probabilities, the posterior for
-$\lambda$ is
+The systemic factors $\mathbf{y}$ are assumed to be independently normally distributed,
 
-$$P(\lambda|\rho,y,k,N,I)=\frac{P(k|\rho,\lambda,y,N,I)P(\lambda|\rho,y,N,I)}{P(k|N,I)}$$
+$$\mathbf{y}\sim\varphi(y_1)\dots\varphi(y_T)$$
 
-If we choose a beta prior for lambda, $$P(\lambda|\rho,y,N,\alpha,\beta,I)d\lambda=\frac{\lambda^{\alpha-1}(1-\lambda)^{\beta-1}}{\mathrm{Beta}(\alpha,\beta)}$$
 
-the posterior for $\lambda$ is proportional to 
 
-$$P(\lambda|\rho,y,k,N,I)\propto G(y;\lambda,\rho)^{k}
-(1-G(y;\lambda,\rho))^{N-k}\varphi(y)\lambda^{\alpha-1}(1-\lambda)^{\beta-1}$$
+We would like to choose conjugate priors for $\lambda$ and $\rho$. We can derive these in two steps by treating the model as a "hierarchical" model for $\mathbf{G}$. Since (@lh) is a binomial distribution, the priors for $\mathbf{G}$ should be the usual conjugate prior for parameters in a binomial distribution, with hyperparameters $\alpha$ and $\beta$:
 
-The marginal posterior $P(\lambda|\rho,k,N,I)$ is found by integrating out the
+$$P(\lambda,\rho,\mathbf{y}|\alpha,\beta,I) = \prod_{t=1}^{T}P(G_t|\alpha,\beta,I)d\lambda= \frac{1}{\mathrm{Beta}(\alpha,\beta)}\prod_{t=1}^{T}G_t^{\alpha-1}(1-G_t)^{\beta-1}$$
+
+For lambda, we can supposed that this will revert usual conjugate prior for the parameter in a binomial distribution, $$P(\lambda|\rho,y,N,\alpha,\beta,I)d\lambda=\frac{\lambda^{\alpha-1}(1-\lambda)^{\beta-1}}{\mathrm{Beta}(\alpha,\beta)}$$
+
+where $\alpha=0.5,\beta=0.5$ corresponds to Jeffrey's prior and  $\alpha>1,\beta>1$ gives a prior centered on $\lambda=\frac{\alpha-1}{\beta-1}$.
+The conjugate prior for $\rho$
+
+
+
+
+Using Bayes’ theorem for inverting conditional probabilities, the joint posterior for
+$\lambda$ and $\rho$ is
+
+$$P(\lambda,\rho|\mathbf{y},\mathbf{k},\mathbf{N},I)=\frac{P(\mathbf{k}|\rho,\lambda,\mathbf{y},\mathbf{N},I)P(\lambda,\rho|\mathbf{y},\mathbf{N},I)}{P(\mathbf{k}|\mathbf{N},I)}$$
+
+The marginal posterior $P(\lambda,\rho|k,N,I)$ is found by integrating out the
 unobserved variable $y$
-
-$P(\lambda|\rho,k,N,I)\propto \int_0^1 (1-G(y;\lambda,\rho))^{N-k}\varphi(y)\lambda^{\alpha-1}(1-\lambda)^{\beta-1} \mathrm{d}y$
 
 We implement this model in Stan  [@stan-software:2014] as follows:
