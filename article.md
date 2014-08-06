@@ -20,18 +20,18 @@ The systemic factors $\mathbf{y}$ are assumed to be independently normally distr
 
 $$\mathbf{y}\sim\varphi(y_1)\dots\varphi(y_T)$$
 
-For the sake of simplicity, we choose independent priors for the $\lambda_b$ and $\rho$. Since the priors for the $\lambda_b$
+For the sake of simplicity, we choose independent priors for the $\lambda_b$ and $\rho$. Since for $\rho=0$ a natural choice of priors for the $\lambda_b$ is
 
 $$P(\lambda|\alpha,\beta,I) = \frac{1}{\mathrm{Beta}(\alpha,\beta)}\lambda^{\alpha-1}(1-\lambda)^{\beta-1}$$
 
-where $\alpha=0.5,\beta=0.5$ corresponds to Jeffrey's prior and  $\alpha>1,\beta>1$ gives a prior centered on $\lambda=\frac{\alpha-1}{\beta-1}$. For $rho$ we choose a uniform prior,
+we take this as the marginal prior for $\lambda$ as well. Here $\alpha=0.5,\beta=0.5$ corresponds to Jeffrey's prior and  $\alpha>1,\beta>1$ gives a prior centered on $\lambda=\frac{\alpha-1}{\beta-1}$. For $rho$ we choose a uniform prior,
 
 $$P(\rho) = \begin{matrix} 1 & 0<=\rho<=1 \\ 0 & \text{otherwise} \end{matrix}$$ 
 
 Using Bayes’ theorem for inverting conditional probabilities, the joint posterior for
-$\lambda$ and $\rho$ is
+$\lambda$ and $\rho$ is then
 
-$$P(\lambda,\rho|\mathbf{y},\mathbf{k},\mathbf{N},I)=\frac{P(\mathbf{k}|\rho,\lambda,\mathbf{y},\mathbf{N},I)P(\lambda,\rho|\mathbf{y},\mathbf{N},I)}{P(\mathbf{k}|\mathbf{N},I)}$$
+$$P(\mathbf{\lambda},\rho,\mathbf{y}|\mathbf{k},\mathbf{N},I)\propto P(\mathbf{k}|\rho,\lambda,\mathbf{y},\mathbf{N},I)  P(\rho)\prod_{b} P(\lambda_b) \prod_t P(y_t)$$
 
 The marginal posterior $P(\lambda,\rho|k,N,I)$ is found by integrating out the
 unobserved variable $y$
