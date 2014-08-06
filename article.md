@@ -1,40 +1,41 @@
-# Bayesian model benchmarking (working title)
-## Motivation
-## Setup/data description 
+# Single factor one-period model
 
-We are given a dataset of ratings 
+## Introduction
 
-$$\left[ x_{ij}\right]_{I_{ij}=1}\in\mathbb{R}, i=1\dots N,j=1\dots M, I_{ij} \in [0,1]$$
+[...]
 
-of $M$ counterparties by $N$ banks. The ratings $x$ are transformed to be numbers on the real line; for instance, if given as probability of default estimates $p\in[0,1]$, we transform these as $x=\Phi^{-1}(p)$. Not all counterparties are rated by all banks; we write this as an incidence matrix $I_{ij}$ where $I_{ij}=1$ if a rating by bank $i$ for counterparty $j$ exists.
+## Model specification
+The likelihood of finding $k_{bt}$ defaults out of $N_{bt}$
+observations for subportfolios $b=1\dots B$, in periods $t=1\dots T$, given the value of the systemic factors $y_t$, the long-term average default rates $\lambda_b$ and the asset
+correlation $\rho$, is given by:
 
-## Model description
-Our model is particularly simple:
+$$P(k_{bt}|\rho,\lambda_b,y_t,N_{bt})=\left(\begin{matrix} k_t \\ N_t\end{matrix}\right) G_{bt}^{k_{bt}}
+(1-G_{bt})^{N_{bt}-k_{bt}}$$ 
 
-$$ 
-x_{ij|I_{ij}=1}  \sim  \mathrm {Normal} (q_{j} + \mu_{i},\tau_i^{-1} ) 
-$$
+where the $G_{bt}$ are defined as
 
-Each rating $x_{.j}$ is an estimate of the (unknown)  'true' rating $q_j$ of that counterparty. We assume that each bank $i$ uses a model characterized by a bias $\mu_i$ and a precision $\tau_i = \sigma_i^{-2}$ which are the same for each rating of that bank, and we assume that the $x_{.j}$ are uncorrelated.
-As it is, this model suffers from an M-way invariance;  under the simultaneous transformations
+$$G_{bt}(y_t;\lambda_b,\rho)=\Phi(\frac{\Phi^{-1} (\lambda_b)-\sqrt{\rho} y_t}{\sqrt{1-\rho}}) $$
 
-$$
-	\begin{matrix} q_j \to q_j+a_{ij} \\ \mu_i\to\mu_i-a_{ij} \end{matrix}
-$$
+The systemic factors $\mathbf{y}$ are assumed to be independently normally distributed,
 
-for any set of exclusive[^1] pairs $(i,j)$  the resulting distribution of $x_{ij}$ will be the same.
-We can remove the collinearity by setting (for instance) all $q_j  = \sum_{i=1}^N I_{ij} x_{ij} / \sum_{i=1}^N I_{ij}, j = 1\dots M$[^2] and restate our model in terms of $x_{ij} \to x_{ij}-q_j$. The bias parameters then represent the bias relative to the average rating (which may, of course, itself be a biased estimate).Note that this also removes any dependence on $x_{.j}$ where $\sum_1^N x_{ij}=1$, i.e., counterparties for which only one rating is available. 
-We wish to estimate the marginal posterior density for the $\mu_i$,
-$$P(\mu|x,I,M,N)=\int\dots\int P(\mu|\tau,x,I,M,N)\mathrm{d}\tau_1 \dots \mathrm{d}\tau_M$$
+$$\mathbf{y}\sim\varphi(y_1)\dots\varphi(y_T)$$
 
-We choose the usual conjugate joint priors for the $\mu_i$ and $\tau_i$,
+For the sake of simplicity, we choose independent priors for the $\lambda_b$ and $\rho$. Since for $\rho=0$ a natural choice of priors for the $\lambda_b$ is
 
-$$\mathrm{P}(\mu_i,\tau_i|\dots)=\mathrm{NormalGamma}(\mu_{0i},\nu_i,\alpha_i,\beta_i)$$
+$$P(\lambda|\alpha,\beta,I) = \frac{1}{\mathrm{Beta}(\alpha,\beta)}\lambda^{\alpha-1}(1-\lambda)^{\beta-1}$$
 
-with 
-$$\begin{matrix} \mu_{0i}=0, i=1\dots N \\ \nu_i \end{matrix}$$
-### Implementation in Stan
-Stan [@stan-software:2014]
+we take this as the marginal prior for $\lambda$ as well. Here $\alpha=0.5,\beta=0.5$ corresponds to Jeffrey's prior and  $\alpha>1,\beta>1$ gives a prior centered on $\lambda=\frac{\alpha-1}{\beta-1}$. For $rho$ we choose a uniform prior,
 
-[^1]: I.e., choose all pairs $(i,j)$ such that each $i$ and $j$ occur at most once
-[^2]: Alternatively, we could set some constraint on the $q_j$ by specifying a prior which breaks the symmetry.
+$$P(\rho) = \begin{matrix} 1 & 0<=\rho<=1 \\ 0 & \text{otherwise} \end{matrix}$$ 
+
+Using Bayes’ theorem for inverting conditional probabilities, the joint posterior for
+$\lambda$ and $\rho$ is then
+
+$$P(\mathbf{\lambda},\rho,\mathbf{y}|\mathbf{k},\mathbf{N},I)\propto P(\mathbf{k}|\rho,\lambda,\mathbf{y},\mathbf{N},I)  P(\rho)\prod_{b} P(\lambda_b) \prod_t P(y_t)$$
+
+The marginal posterior $P(\lambda,\rho|k,N,I)$ is found by integrating out the
+unobserved variable $y$
+
+We implement this model in Stan  [@stan-software:2014] as follows:
+
+	
