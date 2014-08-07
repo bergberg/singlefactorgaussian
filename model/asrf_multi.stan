@@ -9,8 +9,10 @@ parameters {
   real<lower=0,upper=1> rho;
   real y[T];
 
-  # real<lower=0>lambda_alpha[B];    # parameters of the beta distribution
-  # real<lower=0>lambda_beta[B];     
+  # real<lower=0>lambda_alpha[B];    # parameters of the beta distributions
+  # real<lower=0>lambda_beta[B];
+  # real<lower=0>rho_alpha;
+  # real<lower=0>rho_beta;     
 
 }
 transformed parameters {
@@ -27,10 +29,14 @@ model {
   
   for (b in 1:B)
     # normal_cdf(nu[b], 0.0, 1.0) ~ beta(0.5, 0.5);
-    increment_log_prob(beta_log(normal_cdf(nu[b], 0.0, 1.0), 0.5, 0.5));
+    increment_log_prob(beta_log(normal_cdf(nu[b], 0.0, 1.0), 1.0, 1.0));
+    # increment_log_prob(beta_log(normal_cdf(nu[b], 0.0, 1.0), lambda_alpha[b],lambda_beta[b]));
 
 
-  rho ~ uniform(0.0,1.0);  
+  # rho ~ beta(rho_alpha,rho_beta);
+  
+  rho ~ uniform(0.0, 1.0);
+
   y ~ normal(0.0,1.0);
 
   for (t in 1:T)

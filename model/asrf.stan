@@ -23,8 +23,8 @@ model {
 
   
   # normal_cdf(nu, 0.0, 1.0) ~ beta(lambda_alpha,lambda_beta);
-
-  increment_log_prob(beta_log(normal_cdf(nu, 0.0, 1.0), lambda_alpha, lambda_beta));
+  # increment_log_prob(beta_log(normal_cdf(nu, 0.0, 1.0), 1.0,1.0));
+  increment_log_prob(beta_log(normal_cdf(nu, 0.0, 1.0), lambda_alpha,lambda_beta));
 
 
   rho ~ uniform(0.0,1.0);  
