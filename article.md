@@ -28,7 +28,7 @@ For the sake of simplicity, we choose independent priors for the $\lambda_b$ and
 
 $$P(\lambda|\alpha,\beta,I) = \frac{1}{\mathrm{Beta}(\alpha,\beta)}\lambda^{\alpha-1}(1-\lambda)^{\beta-1}$$
 
-Here $\alpha=0.5,\beta=0.5$ corresponds to Jeffrey's prior and  $\alpha>1,\beta>1$ gives a prior centered on $\lambda=\frac{\alpha-1}{\beta-1}$. For $\rho$ we choose a uniform prior on $[0,1]$,
+For $\rho$ we choose a uniform prior on $[0,1]$,
 
 $$P(\rho) = \begin{matrix} 1 & 0<=\rho<=1 \\ 0 & \text{otherwise} \end{matrix}$$ 
 
@@ -44,6 +44,11 @@ We implement this model in Stan  [@stan-software:2014]. See the [appendix](#app)
 
 ### Data
 We use a dataset including yearly default incidences for Dutch mortgages from September 2007 to September 2013. 
+
+### Results
+See the figure (#rhofig) below.
+
+![Posterior distribution for $\rho$](rho.eps) {#rhofig}
 
 ### Appendix: Stan implementation {#app}
 
