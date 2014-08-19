@@ -90,12 +90,12 @@ from September 2007 to September 2013. The data was collected directly from bank
 Results
 -------
 
-See [rhofig] below.
+<div id="fig:rhofig">
+![Posterior of $\rho$ \label{fig:rhofig}](figures\rho.pdf)
 
+</div>
 
-
-
-[rhofig]: figures\rho.pdf
+See [figure](#fig:rhofig).
 
 
 Appendix: Stan implementation
